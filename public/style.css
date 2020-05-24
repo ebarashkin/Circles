@@ -1,0 +1,26 @@
+#wrap{
+	margin: 0 auto;
+	width: 800px;
+    height: 600px;
+    background: #e7e7e7;
+    border: 1px solid #000;
+    position: relative;
+
+}
+
+#circle{
+	position: absolute;
+	border-radius: 100%;
+}
+
+#buttons{
+	margin-top: 60px;
+	text-align: center;
+}
+
+#button1, .button2 {
+	padding: 10px 25px;
+	background: #000;
+	color: white;
+	display: inline-block;
+}
