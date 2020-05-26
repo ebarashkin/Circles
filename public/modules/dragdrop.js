@@ -1,119 +1,101 @@
-import { upOptions, f } from './socket.js'; 
-import { optionCircle } from './circle.js'; 
+import { upOptions, f } from './socket.js';
+import { optionCircle } from './circle.js';
 import { checkIntersectionCircle } from './hidden.js';
 
 function dragAndDrop() {
+  let wrap = document.querySelector('#wrap');
+  let coordWrap = wrap.getBoundingClientRect(); // Получаем координаты контейнера
 
-	let wrap = document.querySelector('#wrap') 
-	let coordWrap = wrap.getBoundingClientRect() // Получаем координаты контейнера
+  document.addEventListener('mousedown', (event) => {
+    let dragElement = event.target.closest('#circle'); // Определяем элемент, по которому произвели клик
 
-	document.addEventListener('mousedown', event => {
+    if (!dragElement) return; // Если элемента нет, то начинаем заново
+    const dragElemInArray = f.find(
+      (c) => `circle-${c.id}` === dragElement.className
+    );
 
-		let dragElement = event.target.closest('#circle'); // Определяем элемент, по которому произвели клик
+    event.preventDefault();
 
-		if (!dragElement) return; // Если элемента нет, то начинаем заново
+    let circleCoords = 0;
+    let circleRadius = dragElement.offsetWidth;
 
-		event.preventDefault();
+    function moveAt(pageX, pageY) {
+      let coordDrag = dragElement.getBoundingClientRect(); // Получаем координаты двигующегося шарика
 
-		let circleCoords = 0;
-		let circleRadius = dragElement.offsetWidth;
-		
+      let newX = pageX - circleRadius / 2 - coordWrap.x;
+      let newY = pageY - circleRadius / 2 - coordWrap.y;
+      let newR = coordWrap.right - circleRadius - coordWrap.x - 2;
+      let newB = coordWrap.bottom - circleRadius - coordWrap.y - 2;
 
+      if (newX < 0) {
+        newX = 0;
+      }
 
-		function moveAt(pageX, pageY) {
-			
-			
+      if (newY < 0) {
+        newY = 0;
+      }
 
-			let coordDrag = dragElement.getBoundingClientRect() // Получаем координаты двигующегося шарика
+      if (newX > newR) {
+        newX = newR;
+      }
 
-			let newX = pageX - circleRadius / 2 - coordWrap.x; 
-			let newY = pageY - circleRadius / 2 - coordWrap.y;
-			let newR = coordWrap.right - circleRadius - coordWrap.x - 2;
-			let newB = coordWrap.bottom - circleRadius - coordWrap.y - 2;
+      if (newY > newB) {
+        newY = newB;
+      }
 
-			if (newX < 0){
-				newX = 0
-			}
+      dragElement.style.left = newX + 'px';
+      dragElement.style.top = newY + 'px';
 
-			if (newY < 0){
-				newY = 0
-			}
+      if (dragElemInArray) {
+        dragElemInArray.x = newX;
+        dragElemInArray.y = newY;
+      }
+    }
 
-			if (newX > newR){
-				newX = newR
-			}
+    function onMouseMove(event) {
+      moveAt(event.pageX, event.pageY);
 
-			if (newY > newB){
-				newY = newB
-			}
+      f.forEach((crcle) => {
+        if (dragElement.className === `circle-${crcle.id}`) {
+          return;
+        }
 
-			dragElement.style.left = newX + 'px';
-			dragElement.style.top = newY + 'px';
+        if (testCollision(crcle)) {
+          console.log('пересечение', crcle);
+          document.querySelector(`.circle-${crcle.id}`).hidden = true;
+        } else {
+          console.log('не пересечение', crcle);
+          document.querySelector(`.circle-${crcle.id}`).hidden = false;
+        }
+      });
+    }
 
+    function onMouseUp(event) {
+      finishDrag();
+    }
 
-		}
+    document.addEventListener('mousemove', onMouseMove);
+    dragElement.addEventListener('mouseup', onMouseUp);
 
-		function onMouseMove(event) {
-			
-			moveAt(event.pageX, event.pageY);
+    function finishDrag() {
+      document.removeEventListener('mousemove', onMouseMove);
+      dragElement.removeEventListener('mouseup', onMouseUp);
+    }
 
-			for (let i = 0; i < f.length; i++){
-				for (let j = f.length - 1; j >= i; j--){
-					if( dragElement.className != `circle-${f[i].id}`){	
-						if ( testCollision(i, j) ) {
-							document.querySelector(`.circle-${f[i].id}`).hidden = true;
-						} else {
-							document.querySelector(`.circle-${f[i].id}`).hidden = false;
-						}
-					}
-				}
-				
+    function testCollision(circle) {
+      let i = document
+        .querySelector(`.circle-${circle.id}`)
+        .getBoundingClientRect();
+      let j = dragElement.getBoundingClientRect();
 
-				if (dragElement.className == `circle-${f[i].id}`){
-					f[i].x = event.pageX;
-					f[i].y = event.pageY;
-				}
-			}
-		}
+      return (
+        Math.round(i.top) + i.height > Math.round(j.top) &&
+        Math.round(i.left) + i.width > Math.round(j.left) &&
+        Math.round(i.bottom) - i.height < Math.round(j.bottom) &&
+        Math.round(i.right) - i.width < Math.round(j.right)
+      );
+    }
+  });
+}
 
-		function onMouseUp(event){
-			finishDrag()
-		}
-
-		document.addEventListener('mousemove', onMouseMove)
-		dragElement.addEventListener('mouseup', onMouseUp);
-
-		function finishDrag(){
-			document.removeEventListener('mousemove', onMouseMove);
-			dragElement.removeEventListener('mouseup', onMouseUp);
-		}
-
-		function testCollision(i, j) {
-
-			i = document.querySelector(`.circle-${f[i].id}`).getBoundingClientRect()
-			j = dragElement.getBoundingClientRect()
-
-			return 	i.top + i.height > j.top &&
-					i.left + i.width > j.left &&
-					i.bottom - i.height < j.bottom &&
-					i.right - i.width < j.right
-		}
-
-		function testCollision2(i, j) {
-
-			i = document.querySelector(`.circle-${f[i].id}`).getBoundingClientRect()
-			j = document.querySelector(`.circle-${f[j].id}`).getBoundingClientRect()
-
-			return 	i.top + i.height > j.top &&
-					i.left + i.width > j.left &&
-					i.bottom - i.height < j.bottom &&
-					i.right - i.width < j.right
-		}
-	});
-};
-
-
-export { dragAndDrop }
-
-	
-
+export { dragAndDrop };
