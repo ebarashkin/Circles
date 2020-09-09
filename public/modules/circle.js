@@ -1,4 +1,4 @@
-import { checkIntersectionCircle } from './hidden.js';
+import { checkIntersectionCircle } from './intersection.js';
 
 function random(min, max) {
 	let num = Math.floor(Math.random() * (max - min)) + min;
@@ -17,7 +17,7 @@ function optionCircle() {
 		let color3 = random(0, 255);
 		let color = `rgb(${color1},${color2},${color3})`;
 
-		let radiusCircle = random(10, 50);
+		let radiusCircle = random(20, 50);
 
 		let xCircle = random(0 + radiusCircle, 800 - radiusCircle);
 		let yCircle = random(0 + radiusCircle, 600 - radiusCircle);
@@ -28,7 +28,8 @@ function optionCircle() {
 			x : xCircle,
 			y : yCircle,
 			color: color,
-			status: 1
+			visible: true,
+			dragUp: false
 		});
 	};
 
@@ -43,7 +44,6 @@ let hideCircle = () => {
 		for (let j = c.length - 1; j >= i + 1; j--){
 			if (checkIntersectionCircle(c, i, j)) {
 				c.splice(c[j], 1)
-				c.splice(c[i], 1)
 			}
 		}
 	} return c

@@ -3,13 +3,16 @@ import { optionCircle, createCircle, upPositionCircle, hideCircle } from './circ
 const socket = new WebSocket('ws://localhost:8080/');
 
 let f = hideCircle();
+console.log(f);
+
 
 //Переписываем id элементов массив f по порядку: "0, 1, 2, ..., N"
-for (let i = 0; i < f.length; i++){
-	if (f[i].id != i){
-		f[i].id = i
+
+f.forEach((num, i) => {
+	if (num.id != i){
+		num.id = i
 	}
-}
+})
 
 button1.addEventListener('click', () => {
 	socket.send(JSON.stringify(f));

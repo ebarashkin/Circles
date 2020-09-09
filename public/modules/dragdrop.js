@@ -1,12 +1,16 @@
 import { upOptions, f } from './socket.js';
 import { optionCircle } from './circle.js';
-import { checkIntersectionCircle } from './hidden.js';
+import { checkIntersectionCircle } from './intersection.js';
+import { hideCircle, hideCircleCollision } from './hidden.js';
 
 function dragAndDrop() {
   let wrap = document.querySelector('#wrap');
   let coordWrap = wrap.getBoundingClientRect(); // Получаем координаты контейнера
 
   document.addEventListener('mousedown', (event) => {
+
+    console.log(f)
+
     let dragElement = event.target.closest('#circle'); // Определяем элемент, по которому произвели клик
 
     if (!dragElement) return; // Если элемента нет, то начинаем заново
@@ -62,16 +66,33 @@ function dragAndDrop() {
           return;
         }
 
-        if (testCollision(crcle)) {
-          //console.log('пересечение', crcle);
-          document.querySelector(`.circle-${crcle.id}`).style.visibility = 'hidden'
+        if (testCollision(crcle) ) {
+          crcle.visible = false;
+          dragElement.dragUp = true
+
+
+        } else if (!crcle.visible) {
+            crcle.visible = true;
+
+        }
+
+        const dragElemeCollisionArr = f.find(
+          (c) => `circle-${c.id}` === dragElement.className
+          );
+
+        if (dragElement.dragUp){
+          dragElemeCollisionArr.dragUp = true
         } else {
-          //console.log('не пересечение', crcle);
-          document.querySelector(`.circle-${crcle.id}`).style.visibility = '';
+          dragElemeCollisionArr.dragUp = false
         }
       });
-    }
+     
+     
+     hideCircle();
+     hideCircleCollision ()
 
+    }
+    
     function onMouseUp(event) {
       finishDrag();
     }
@@ -84,33 +105,26 @@ function dragAndDrop() {
       dragElement.removeEventListener('mouseup', onMouseUp);
     }
 
+
+
     function testCollision(circle) {
       let i = document
         .querySelector(`.circle-${circle.id}`)
         .getBoundingClientRect();
       let j = dragElement.getBoundingClientRect();
 
-      let jX = j.x - coordWrap.x - 1 + j.width/2
-      let jY = j.y - coordWrap.y - 1 + j.width/2
+      let maxDistanceCircle = j.width/2 + i.width/2;
 
-      let iX = i.x - coordWrap.x - 1 + i.width/2
-      let iY = i.y - coordWrap.y - 1 + i.width/2
+      maxDistanceCircle *= maxDistanceCircle;
 
-      console.log(Math.abs(jX - iX));
-      
+      let dx = j.x - i.x;
+      let dy = j.y - i.y;
 
+      let currentDistanceCircle = dx * dx + dy * dy;
 
-
-      return (
-        Math.abs(jX - iX) <= i.width/2 + i.width/2 &&
-        Math.abs(jY - iY) <= i.width/2 + i.width/2 
-
-        //Math.round(i.top) + i.height > Math.round(j.top) &&
-        //Math.round(i.left) + i.width > Math.round(j.left) &&
-        //Math.round(i.bottom) - i.height < Math.round(j.bottom) &&
-        //Math.round(i.right) - i.width < Math.round(j.right)
-      );
+      return currentDistanceCircle < maxDistanceCircle;
     }
+
   });
 }
 

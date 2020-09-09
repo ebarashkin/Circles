@@ -1,26 +1,26 @@
-let checkIntersectionCircle = (c, i, j) => {
+import { f } from './socket.js';
+import { checkIntersectionCircle } from './intersection.js';
 
-	let iX = c[i].x 
-	let iY = c[i].y
-	let iD = c[i].radius
-	let iR = iX + iD/2 //right circle i 
-	let iL = iX - iD/2 //left circle i
-	let iT = iY - iD/2 //top circle i
-	let iB = iY + iD/2 //bootom circle i
-
-	let jX = c[j].x 
-	let jY = c[j].y
-	let jD = c[j].radius 
-	let jR = jX + jD/2 //right circle j 
-	let jL = jX - jD/2 //left circle j
-	let jT = jY - jD/2 //top circle j
-	let jB = jY + jD/2 //bootom circle j
-
-
-	return 	iT + iD > jT &&
-			iL + iD > jL && 
-			iB - iD < jB && 
-			iR - iD < jR 
+function hideCircle () {
+  f.forEach((crcle) => {
+    if (crcle.visible){
+      document.querySelector(`.circle-${crcle.id}`).classList.remove("hidden");
+    } else {
+        document.querySelector(`.circle-${crcle.id}`).classList.add("hidden");
+    }
+  })
 }
 
-export { checkIntersectionCircle }
+function hideCircleCollision () {
+  f.forEach((crcle) => {
+    if (crcle.dragUp){
+      for (let i = 0; i < f.length; i++){
+       if (checkIntersectionCircle(f, i, crcle.id) && i !=crcle.id ) {
+        document.querySelector(`.circle-${f[i].id}`).classList.add("hidden");
+        }
+      }
+    }
+  })
+}
+
+export { hideCircle, hideCircleCollision }
