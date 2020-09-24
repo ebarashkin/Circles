@@ -8,7 +8,7 @@ function random(min, max) {
 function optionCircle() {
 
 	let result = []
-	let n = random(1, 100);
+	let n = random(3, 100);
 
 	for (let i = 0; i <= n; i++) {
 

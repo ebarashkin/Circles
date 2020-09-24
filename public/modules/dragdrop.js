@@ -9,8 +9,6 @@ function dragAndDrop() {
 
   document.addEventListener('mousedown', (event) => {
 
-    console.log(f)
-
     let dragElement = event.target.closest('#circle'); // Определяем элемент, по которому произвели клик
 
     if (!dragElement) return; // Если элемента нет, то начинаем заново
@@ -56,6 +54,8 @@ function dragAndDrop() {
         dragElemInArray.x = newX;
         dragElemInArray.y = newY;
       }
+
+      upOptions(newX, newY, dragElement.className)
     }
 
     function onMouseMove(event) {
@@ -70,15 +70,18 @@ function dragAndDrop() {
           crcle.visible = false;
           dragElement.dragUp = true
 
-
         } else if (!crcle.visible) {
-            crcle.visible = true;
-
+          crcle.visible = true;
         }
 
         const dragElemeCollisionArr = f.find(
           (c) => `circle-${c.id}` === dragElement.className
           );
+
+        if(crcle.dragUp && !crcle.visible){
+          crcle.visible = true;
+          crcle.dragUp = false;
+        } 
 
         if (dragElement.dragUp){
           dragElemeCollisionArr.dragUp = true
@@ -86,7 +89,6 @@ function dragAndDrop() {
           dragElemeCollisionArr.dragUp = false
         }
       });
-     
      
      hideCircle();
      hideCircleCollision ()
@@ -104,7 +106,6 @@ function dragAndDrop() {
       document.removeEventListener('mousemove', onMouseMove);
       dragElement.removeEventListener('mouseup', onMouseUp);
     }
-
 
 
     function testCollision(circle) {

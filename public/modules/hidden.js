@@ -1,12 +1,22 @@
-import { f } from './socket.js';
+import { upVisibleCircle, upHiddenCircle, f } from './socket.js';
 import { checkIntersectionCircle } from './intersection.js';
+
+function addHiddenClass(circle){
+  document.querySelector(circle).classList.add("hidden");
+}
+
+function removeHiddenClass(circle){
+  document.querySelector(circle).classList.remove("hidden");
+}
 
 function hideCircle () {
   f.forEach((crcle) => {
     if (crcle.visible){
-      document.querySelector(`.circle-${crcle.id}`).classList.remove("hidden");
+        removeHiddenClass(`.circle-${crcle.id}`)
+        upVisibleCircle(crcle.id)
     } else {
-        document.querySelector(`.circle-${crcle.id}`).classList.add("hidden");
+        addHiddenClass(`.circle-${crcle.id}`)
+        upHiddenCircle(crcle.id)
     }
   })
 }
@@ -15,12 +25,13 @@ function hideCircleCollision () {
   f.forEach((crcle) => {
     if (crcle.dragUp){
       for (let i = 0; i < f.length; i++){
-       if (checkIntersectionCircle(f, i, crcle.id) && i !=crcle.id ) {
-        document.querySelector(`.circle-${f[i].id}`).classList.add("hidden");
+        if (checkIntersectionCircle(f, i, crcle.id) && i !=crcle.id ) {
+          addHiddenClass(`.circle-${f[i].id}`)
+          upHiddenCircle(f[i].id)
         }
       }
     }
   })
 }
 
-export { hideCircle, hideCircleCollision }
+export { hideCircle, hideCircleCollision, addHiddenClass, removeHiddenClass}

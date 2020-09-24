@@ -38,9 +38,12 @@ ws.on('request', req => {
     const data = message[dataName];
     console.log('Inbox: ' + data);
 
+
     for (let client of map.keys()){
-      client.send(data);
-      console.log('Send: ' + data);
+      if (client != connection){
+        client.send(data);
+        console.log('Send: ' + data);
+      }
     }
 
   });
